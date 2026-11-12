@@ -8,7 +8,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
 
-app = typer.Typer(help="D-ORCHESTRATOR: multi-provider AI engineering command center")
+app = typer.Typer(help="DCode: multi-provider AI engineering command center")
 console = Console()
 
 VERSION = "1.0.0"
@@ -23,7 +23,7 @@ def _db():
 @app.callback(invoke_without_command=True)
 def main(ctx: typer.Context, version: bool = typer.Option(False, "--version", help="Show version")):
     if version:
-        console.print(f"D-ORCHESTRATOR {VERSION}")
+        console.print(f"DCode {VERSION}")
         raise typer.Exit()
     if ctx.invoked_subcommand is None:
         # launch interactive terminal
@@ -42,13 +42,13 @@ def init():
     import asyncio
     asyncio.run(provider_registry.refresh_all(db))
     db.close()
-    console.print("[green]Initialized D-ORCHESTRATOR.[/green]")
+    console.print("[green]Initialized DCode.[/green]")
 
 
 @app.command()
 def doctor():
     """Check environment and integrations."""
-    console.print(Panel("D-ORCHESTRATOR Doctor", style="cyan"))
+    console.print(Panel("DCode Doctor", style="cyan"))
     # python
     console.print(f"Python: {sys.version.split()[0]}")
     # ollama
@@ -216,7 +216,7 @@ def models_search(query: str):
 @models_app.command("use")
 def models_use(model: str):
     # store default in env/config file
-    cfg = Path.home() / ".dorchestrator"
+    cfg = Path.home() / ".dcode"
     cfg.mkdir(exist_ok=True)
     (cfg / "default_model.txt").write_text(model)
     console.print(f"[green]Default model set to {model}[/green]")
@@ -258,7 +258,7 @@ def providers_list():
 @providers_app.command("connect")
 def providers_connect(provider: str, api_key: str = typer.Option(None, "--api-key")):
     # store env hint
-    console.print(f"To connect {provider}, set the appropriate environment variable and run `dorchestrator providers test {provider}`.")
+    console.print(f"To connect {provider}, set the appropriate environment variable and run `dcode providers test {provider}`.")
     if api_key:
         console.print("[yellow]API key passed via CLI is not stored for security; use environment variables.[/yellow]")
 
@@ -404,7 +404,7 @@ def dashboard():
 
 @app.command()
 def config():
-    console.print("Config stored in ~/.dorchestrator and backend/data")
+    console.print("Config stored in ~/.dcode and backend/data")
 
 
 @app.command()
@@ -425,7 +425,7 @@ def memory():
 @app.command()
 def reset():
     if Confirm.ask("Reset database?"):
-        p = Path(__file__).resolve().parent.parent / "backend" / "data" / "d_orchestrator.db"
+        p = Path(__file__).resolve().parent.parent / "backend" / "data" / "dcode.db"
         if p.exists():
             p.unlink()
         console.print("[green]Database reset.[/green]")

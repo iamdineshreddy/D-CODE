@@ -138,7 +138,7 @@ def _handle_slash(cmd: str, session_id: str | None):
 
 
 def run_interactive(resume_sid: str = None):
-    console.print(Panel("D-ORCHESTRATOR Interactive Terminal", style="cyan"))
+    console.print(Panel("DCode Interactive Terminal", style="cyan"))
     session_id = resume_sid or os.environ.get("DORCH_SESSION")
     # create session if none
     if not session_id:

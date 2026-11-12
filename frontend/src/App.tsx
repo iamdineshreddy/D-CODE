@@ -35,7 +35,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex">
       <aside className="w-60 border-r border-gray-800 p-4 flex flex-col gap-2">
-        <h1 className="text-xl font-bold text-cyan-400 mb-4">D-ORCHESTRATOR</h1>
+        <h1 className="text-xl font-bold text-cyan-400 mb-4">DCode</h1>
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`text-left px-3 py-2 rounded ${tab===t ? 'bg-cyan-600 text-white' : 'hover:bg-gray-800'}`}>{t}</button>

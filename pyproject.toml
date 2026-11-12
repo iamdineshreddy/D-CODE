@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dorchestrator"
+name = "dcode"
 version = "1.0.0"
-description = "D-ORCHESTRATOR multi-provider AI engineering command center"
+description = "DCode multi-provider AI engineering command center"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.110",
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-dorchestrator = "cli.main:app"
+dcode = "cli.main:app"
 
 [tool.setuptools]
 packages = ["cli"]

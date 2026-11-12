@@ -33,7 +33,7 @@ async def lifespan(app):
         pass
     yield
 
-app = FastAPI(title="D-ORCHESTRATOR", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="DCode", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,7 +45,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "app": "D-ORCHESTRATOR"}
+    return {"status": "ok", "app": "DCode"}
 
 # Providers
 @app.get("/api/providers")

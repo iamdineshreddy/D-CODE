@@ -1,4 +1,4 @@
-# D-ORCHESTRATOR
+# DCode
 
 Local-first multi-provider AI engineering platform.
 
@@ -47,5 +47,5 @@ python -m pytest tests/ -q
 
 - Ollama models are auto-discovered.
 - OpenCode models are discovered via `opencode models`.
-- SQLite DB stored in backend/data/d_orchestrator.db.
+- SQLite DB stored in backend/data/dcode.db.
 - Checkpoints stored in backend/data/checkpoints.
