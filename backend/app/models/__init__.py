@@ -3,8 +3,10 @@ from .task import Task, Checkpoint, TaskStep
 from .usage import UsageRecord, Budget
 from .memory import ProjectMemory
 from .approval import ApprovalRequest
+from .session import Session, Message
 
 __all__ = [
     "Provider", "ModelRecord", "Task", "Checkpoint", "TaskStep",
     "UsageRecord", "Budget", "ProjectMemory", "ApprovalRequest",
+    "Session", "Message",
 ]

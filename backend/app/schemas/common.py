@@ -138,3 +138,46 @@ class ApprovalOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class SessionCreate(BaseModel):
+    title: Optional[str] = None
+    project_name: Optional[str] = None
+    project_dir: Optional[str] = None
+    provider_name: Optional[str] = None
+    model_id: Optional[str] = None
+
+
+class SessionOut(BaseModel):
+    id: str
+    title: Optional[str] = None
+    project_name: Optional[str] = None
+    project_dir: Optional[str] = None
+    provider_name: Optional[str] = None
+    model_id: Optional[str] = None
+    status: str
+    message_count: int
+    input_tokens: int
+    output_tokens: int
+    estimated_cost: float
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    last_active: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class MessageOut(BaseModel):
+    id: str
+    session_id: str
+    role: str
+    content: str
+    model_id: Optional[str] = None
+    provider_name: Optional[str] = None
+    input_tokens: int = 0
+    output_tokens: int = 0
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

@@ -23,7 +23,14 @@ export default function App() {
       setOverview(o); setProviders(p); setModels(m); setTasks(t); setUsage(u); setBudget(b); setApprovals(a)
     } catch (e) { console.error(e) }
   }
-  useEffect(() => { refresh(); const i = setInterval(refresh, 8000); return () => clearInterval(i) }, [])
+  useEffect(() => { refresh(); const i = setInterval(refresh, 8000); 
+    let ws: WebSocket | null = null
+    try {
+      ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws')
+      ws.onmessage = () => refresh()
+    } catch(e) {}
+    return () => { clearInterval(i); if (ws) ws.close() }
+  }, [])
 
   return (
     <div className="min-h-screen flex">

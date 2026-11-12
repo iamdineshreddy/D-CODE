@@ -1,6 +1,7 @@
 import os, asyncio
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from .db import init_db, get_db, SessionLocal
@@ -176,6 +177,88 @@ async def recover_task(task_id: str, db: Session = Depends(get_db)):
         return await task_executor.run_task(db2, task_id)
     finally:
         db2.close()
+
+# Sessions
+@app.post("/api/sessions")
+def create_session(req: SessionCreate, db: Session = Depends(get_db)):
+    s = models.Session(
+        title=req.title,
+        project_name=req.project_name,
+        project_dir=req.project_dir,
+        provider_name=req.provider_name,
+        model_id=req.model_id,
+    )
+    db.add(s)
+    db.commit()
+    db.refresh(s)
+    return SessionOut.model_validate(s)
+
+@app.get("/api/sessions")
+def list_sessions(db: Session = Depends(get_db)):
+    ss = db.query(models.Session).order_by(models.Session.last_active.desc()).all()
+    return [SessionOut.model_validate(s) for s in ss]
+
+@app.get("/api/sessions/{sid}")
+def get_session(sid: str, db: Session = Depends(get_db)):
+    s = db.query(models.Session).filter(models.Session.id == sid).first()
+    if not s:
+        raise HTTPException(404)
+    return SessionOut.model_validate(s)
+
+@app.get("/api/sessions/{sid}/messages")
+def list_messages(sid: str, db: Session = Depends(get_db)):
+    ms = db.query(models.Message).filter(models.Message.session_id == sid).order_by(models.Message.created_at.asc()).all()
+    return [MessageOut.model_validate(m) for m in ms]
+
+@app.post("/api/sessions/{sid}/messages")
+def add_message(sid: str, payload: dict, db: Session = Depends(get_db)):
+    s = db.query(models.Session).filter(models.Session.id == sid).first()
+    if not s:
+        raise HTTPException(404)
+    m = models.Message(
+        session_id=sid,
+        role=payload.get("role", "user"),
+        content=payload.get("content", ""),
+        model_id=payload.get("model_id"),
+        provider_name=payload.get("provider_name"),
+        input_tokens=payload.get("input_tokens", 0),
+        output_tokens=payload.get("output_tokens", 0),
+    )
+    db.add(m)
+    s.message_count = (s.message_count or 0) + 1
+    s.input_tokens = (s.input_tokens or 0) + (payload.get("input_tokens", 0) or 0)
+    s.output_tokens = (s.output_tokens or 0) + (payload.get("output_tokens", 0) or 0)
+    db.commit()
+    db.refresh(m)
+    return MessageOut.model_validate(m)
+
+@app.delete("/api/sessions/{sid}")
+def delete_session(sid: str, db: Session = Depends(get_db)):
+    s = db.query(models.Session).filter(models.Session.id == sid).first()
+    if not s:
+        raise HTTPException(404)
+    db.query(models.Message).filter(models.Message.session_id == sid).delete()
+    db.delete(s)
+    db.commit()
+    return {"status": "deleted"}
+
+# WebSocket for real-time sync
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            db = SessionLocal()
+            try:
+                from app.models import Task
+                tasks = db.query(Task).order_by(Task.updated_at.desc()).limit(20).all()
+                payload = [{"id": t.id, "title": t.title, "status": t.status, "model": t.current_model} for t in tasks]
+                await websocket.send_json({"type": "tasks", "data": payload})
+            finally:
+                db.close()
+            await asyncio.sleep(3)
+    except WebSocketDisconnect:
+        pass
 
 # Usage
 @app.get("/api/usage/summary")
